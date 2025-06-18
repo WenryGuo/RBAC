@@ -13,8 +13,8 @@ std::shared_ptr<sql::Connection> get_mysql_connection(){
          // 获取 MySQL 驱动
          driver = sql::mysql::get_mysql_driver_instance();
          // 建立连接
-         con = driver->connect("tcp://127.0.0.1:3306", "root", ""); 
-         con->setSchema("rbac_db");
+         con = driver->connect("tcp://127.0.0.1:3306", "root", "abc@123"); 
+         con->setSchema("RBAC");
          return std::shared_ptr<sql::Connection>(con);
      } catch (sql::SQLException &e) {
          std::cerr << "Error connecting to MySQL: " << e.what() << std::endl;
@@ -24,14 +24,16 @@ std::shared_ptr<sql::Connection> get_mysql_connection(){
 int main(){
     crow::SimpleApp app; // 创建Crow Web应用
     // 定义路由
-    CROW_ROUTE(app, "/users")([](){
-        return "Hello, Crow!";
+    CROW_ROUTE(app, "/")([](){
+        return "Hello, Crow!\n";
     });
     CROW_ROUTE(app, "/json")([](){
         // 获取数据库连接
         auto con = get_mysql_connection();
         if(!con){
-            return crow::response(500, "Failed to connect to database");
+            crow::json::wvalue data;
+            data["error"] = "Failed to connect to database\n";
+            return data;
         }
         // 查询所有用户
         std::shared_ptr<sql::Statement> stmt(con->createStatement());
