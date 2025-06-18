@@ -1,0 +1,1 @@
+/usr/bin/c++ CMakeFiles/crow_server.dir/crow_server.cpp.o -o crow_server  -lpthread 

@@ -1,0 +1,3 @@
+/home/wenry/Projects/RDMA/build/CMakeFiles/crow_server.dir
+/home/wenry/Projects/RDMA/build/CMakeFiles/edit_cache.dir
+/home/wenry/Projects/RDMA/build/CMakeFiles/rebuild_cache.dir
