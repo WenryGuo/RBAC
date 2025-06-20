@@ -3,6 +3,9 @@ import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Home from "./pages/home";
+import Register from './pages/register';
+import Login from './pages/login';
 import Users from './pages/users';
 
 function App() {
@@ -32,11 +35,17 @@ function App() {
          Click on the Vite and React logos to learn more
        </p>
      </>*/
-    <Router>
-      <Routes>
-        <Route path="/" element={<Users />} />
-      </Routes>
-    </Router>
+    // <Router>
+    //   <Routes>
+    //     <Route path="/" element={<Users />} />
+    //   </Routes>
+    // </Router>
+    <Routes>
+      <Route path="/" element={<Home />} />
+      <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
+      <Route path="/users" element={<Users />} />
+    </Routes>
   )
 }
 

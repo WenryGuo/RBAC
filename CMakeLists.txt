@@ -10,8 +10,9 @@ add_executable(crow_server crow_server.cpp)
 target_include_directories(crow_server PRIVATE ${CMAKE_SOURCE_DIR}/Crow/include) # 添加头文件
 target_include_directories(crow_server PRIVATE ${CMAKE_SOURCE_DIR}/asio/asio) # 添加asio头文件,Crow依赖这个库
 target_include_directories(crow_server PRIVATE /usr/include/cppconn)
+target_include_directories(crow_server PRIVATE /usr/local/include)
 
 # 添加pthread库支持
 target_link_libraries(crow_server pthread)
 # 链接 MySQL Connector库
-target_link_libraries(crow_server mysqlcppconn)
+target_link_libraries(crow_server mysqlcppconn bcrypt)
