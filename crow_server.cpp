@@ -110,22 +110,6 @@ int main()
                                 return data;
                              }
                              //  获取role_id
-                            //  int roleId = 0;
-                            
-                            //     try{
-                            //         std::shared_ptr<sql::PreparedStatement> stmt(
-                            //             con->prepareStatement("SELECT role_id FROM roles WHERE role_name = ?"));
-                            //         stmt->setString(1, roleName);
-                            //         std::shared_ptr<sql::ResultSet> res( stmt->executeQuery());
-                            //         if (res->next()) {
-                            //             roleId = res->getInt("role_id");
-                            //         } else {
-                            //             data["400"] = "角色不存在";
-                            //             return data;
-                            //         }
-                            //     }catch(sql::SQLException &e){
-
-                            //     }
                                 // 获取userId
                                 int userId = 0;
                                 try{
@@ -194,7 +178,17 @@ int main()
                                     if (BCrypt::validatePassword(password, hash)) {
                                         crow::json::wvalue result;
                                         result["message"] = "Login successful";
+                                        int user_id = res->getInt("id");
                                         result["user_id"] = res->getInt("id");
+                                        std::shared_ptr<sql::PreparedStatement> roleStmt(
+                                            con->prepareStatement("SELECT role_id FROM user_roles WHERE user_id = ?"));
+                                        roleStmt->setInt(1, user_id);
+                                        std::shared_ptr<sql::ResultSet> roleRes(roleStmt->executeQuery());
+                                        int role_id = 0;
+                                        if (roleRes->next()) {
+                                            role_id = roleRes->getInt("role_id");
+                                        }
+                                        result["role_id"] = role_id;
                                         return result;
                                     } else {
                                         data["401"] = "Invalid password";

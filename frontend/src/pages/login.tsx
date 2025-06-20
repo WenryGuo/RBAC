@@ -14,7 +14,9 @@ function Login() {
         username,
         password,
       });
+      // 👇 登录成功，保存 role_id 和 user_id
       localStorage.setItem("user_id", res.data.user_id);
+      localStorage.setItem("role_id", res.data.role_id);
       navigate("/users"); // 登录成功跳转到用户管理
     } catch (err: any) {
       setError(err.response?.data || "登录失败");
