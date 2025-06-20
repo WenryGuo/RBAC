@@ -25,3 +25,6 @@ c++后端密码加密采用bcrypt ,克隆仓库
 | nodejs | v20.19.2 |
 | npm | v11.4.2 |
 | tailwindcss | v4.1.10 |
+# 运行
+1. 前端：进入frontend文件夹，执行npm run dev
+2. 后端：进入执行 ./build/crow_server
