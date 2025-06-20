@@ -76,6 +76,12 @@ int main()
                                  data["400"] = "参数错误";
                                 return data;
                              }
+                             if (!body.has("role")) {
+                                data["400"] = "缺少角色信息";
+                                return data;
+                            }
+                             int roleID = body["role"].i();
+                             std::cout<<"roleID="<<roleID<<std::endl;
                          
                              std::string username = body["username"].s();
                              std::string email = body["email"].s();
@@ -103,6 +109,54 @@ int main()
                                  data["500"] = "注册失败";
                                 return data;
                              }
+                             //  获取role_id
+                            //  int roleId = 0;
+                            
+                            //     try{
+                            //         std::shared_ptr<sql::PreparedStatement> stmt(
+                            //             con->prepareStatement("SELECT role_id FROM roles WHERE role_name = ?"));
+                            //         stmt->setString(1, roleName);
+                            //         std::shared_ptr<sql::ResultSet> res( stmt->executeQuery());
+                            //         if (res->next()) {
+                            //             roleId = res->getInt("role_id");
+                            //         } else {
+                            //             data["400"] = "角色不存在";
+                            //             return data;
+                            //         }
+                            //     }catch(sql::SQLException &e){
+
+                            //     }
+                                // 获取userId
+                                int userId = 0;
+                                try{
+                                    std::shared_ptr<sql::PreparedStatement> stmt(
+                                        con->prepareStatement("SELECT id FROM users WHERE username = ?"));
+                                    stmt->setString(1, username);
+                                    std::shared_ptr<sql::ResultSet> res( stmt->executeQuery());
+                                    if (res->next()) {
+                                        userId = res->getInt("id");
+                                    } else {
+                                        data["400"] = "用户不存在";
+                                        return data;
+                                    }
+                                }catch(sql::SQLException &e){
+                                    std::cerr << "[ERROR] 查询角色失败: " << e.what() << std::endl;
+                                    data["500"] = "查询角色失败";
+                                    return data;
+                                }
+
+                                // 插入 user_roles 表
+                                try{
+                                    std::shared_ptr<sql::PreparedStatement> stmt(
+                                        con->prepareStatement("INSERT INTO user_roles (user_id, role_id) VALUES (?, ?)"));
+                                    stmt->setInt(1, userId);
+                                    stmt->setInt(2, roleID);
+                                    stmt->execute();
+                                }catch(sql::SQLException &e){
+                                    std::cerr << "[ERROR] 插入 user_roles 失败: " << e.what() << std::endl;
+                                    data["500"] = "关联角色失败";
+                                    return data;
+                                }
                          
                              crow::json::wvalue result;
                              result["message"] = "注册成功";
@@ -184,9 +238,10 @@ int main()
         // resp.add_header("Content-Type", "application/json");
         return data; });
 
-    
-    CROW_ROUTE(app, "/roles")([]()
-                             {
+    CROW_ROUTE(app, "/roles").methods("GET"_method)([]()
+                                                    {
+        std::cout << "[INFO] /roles route hit\n";
+
         crow::json::wvalue data;
         // 获取数据库连接
         auto con = get_mysql_connection();
@@ -197,18 +252,22 @@ int main()
         try{
         // 查询所有用户
         std::shared_ptr<sql::Statement> stmt(con->createStatement());
-        std::shared_ptr<sql::ResultSet> res(stmt->executeQuery("SELECT username FROM roles"));
-        crow::json::wvalue::list users_list;
+        std::shared_ptr<sql::ResultSet> res(stmt->executeQuery("SELECT role_id, role_name FROM roles"));
+        crow::json::wvalue::list roles_list;
         int i = 0;
         while(res->next()){
-          users_list.push_back(crow::json::wvalue(res->getString("username")));
+            crow::json::wvalue role;
+            role["id"] = res->getInt("role_id");
+            role["name"] = res->getString("role_name");
+            roles_list.push_back(std::move(role));
+            // roles_list.push_back(crow::json::wvalue(res->getString("role_name")));
         }
-        data["users"] = std::move(users_list);
+        data["roles"] = std::move(roles_list);
     }catch(sql::SQLException &e){
         std::cerr << "SQL error: " << e.what() << std::endl;
         data["error"] = "SQL query failed";
     }
-        return data;});
+        return data; });
     // 监听 8080 端口
     app.port(8080).multithreaded().run();
 }

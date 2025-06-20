@@ -18,7 +18,7 @@ function Register() {
       .then((res) => {
         if (res.data.roles) {
           setRoles(res.data.roles);
-          setSelectedRole(res.data.roles[0]?.id); // 默认选择第一个角色
+          setSelectedRole(res.data.roles[0]); // 默认选择第一个角色
         }
       })
       .catch((err) => {
@@ -73,9 +73,9 @@ function Register() {
         onChange={(e) => setSelectedRole(e.target.value)}
         className="mb-4 p-2 border w-64 rounded"
       >
-        {roles.map((role: any, index) => (
-          <option key={index} value={role.id}>
-            {role.name}
+        {roles.map((role, index) => (
+          <option key={index} value={role}>
+            {role}
           </option>
         ))}
       </select>
